@@ -1,0 +1,237 @@
+---
+title: "Slope stats"
+author: "Emily Kubota"
+date: "7/26/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+
+# these options here change the formatting of how comments are rendered
+opts_chunk$set(
+  comment = "",
+  results = "hold",
+  fig.show = "hold")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+# Read in the data 
+
+df = read_csv("../../data/endpoints.csv",
+                       col_types = cols())
+
+# Filter for LH 
+df <- 
+  df %>% 
+  filter(hem == "lh")
+```
+
+
+```{r}
+
+# Main Effect of Age for each fROI
+
+froi_name = "pFus"
+
+fit_compact_a <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ log10(age_days),.) 
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+
+anova(fit_compact_a,fit_compact_b) 
+
+```
+
+```{r}
+
+froi_name = "pOTS"
+
+fit_compact_a <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ log10(age_days),.) 
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+
+anova(fit_compact_a,fit_compact_b) 
+
+```
+
+
+```{r}
+
+froi_name = "PPA"
+
+fit_compact_a <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ log10(age_days),.) 
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+
+anova(fit_compact_a,fit_compact_b) 
+
+```
+
+```{r}
+
+froi_name = "mFus"
+
+fit_compact_a <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ log10(age_days),.) 
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+
+anova(fit_compact_a,fit_compact_b) 
+
+```
+
+```{r}
+
+froi_name = "OTS"
+
+fit_compact_a <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ log10(age_days),.) 
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+
+anova(fit_compact_a,fit_compact_b) 
+
+```
+
+```{r}
+
+froi_name = "mOTS"
+
+fit_compact_a <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ log10(age_days),.) 
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+
+anova(fit_compact_a,fit_compact_b) 
+
+```
+
+```{r}
+# Glasser ROI x age interaction for each fROI
+
+froi_name = "pFus"
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+fit_augmented <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi * log10(age_days),.) 
+
+
+ anova(fit_compact_b,fit_augmented) 
+```
+
+```{r}
+
+froi_name = "pOTS"
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+fit_augmented <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi * log10(age_days),.) 
+
+
+ anova(fit_compact_b,fit_augmented) 
+```
+
+
+```{r}
+
+froi_name = "PPA"
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+fit_augmented <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi * log10(age_days),.) 
+
+
+ anova(fit_compact_b,fit_augmented) 
+```
+
+```{r}
+
+froi_name = "mFus"
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+fit_augmented <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi * log10(age_days),.) 
+
+
+ anova(fit_compact_b,fit_augmented) 
+```
+
+```{r}
+
+froi_name = "OTS"
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+fit_augmented <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi * log10(age_days),.) 
+
+
+ anova(fit_compact_b,fit_augmented) 
+```
+
+```{r}
+
+froi_name = "mOTS"
+
+fit_compact_b <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi + log10(age_days),.) 
+
+fit_augmented <- df %>% 
+  filter(froi == froi_name) %>% 
+  lm(endpoint_density ~ glasser_roi * log10(age_days),.) 
+
+
+ anova(fit_compact_b,fit_augmented) 
+```

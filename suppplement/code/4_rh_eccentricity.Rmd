@@ -1,0 +1,82 @@
+---
+title: "RH eccentricity"
+author: "Emily Kubota"
+date: "7/26/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+
+# these options here change the formatting of how comments are rendered
+opts_chunk$set(
+  comment = "",
+  results = "hold",
+  fig.show = "hold")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+# Read in the data 
+
+df = read_csv("../../data/eccentricity.csv",
+              col_types = cols())
+
+df <-
+  df %>% 
+  filter(hem == "rh")
+```
+
+
+```{r}
+frois = unique(df$froi)
+for (i in 1:length(frois)){
+df %>% 
+ mutate(Age = recode(age, '0' = '0M',
+                      '0.5' = '',
+                      '3' = '3M',
+                      '3.5' = ' ',
+                      '6' = '6M',
+                      '6.5' = '  ',
+                      'adult' = 'A'))%>% 
+    mutate(Age = fct_relevel(Age, c('0M','','3M',' ','6M','  ','A'))) %>% 
+  mutate(Eccentricity = eccen) %>% 
+  mutate(Eccentricity = fct_relevel(Eccentricity, c('zerofivedegrees','fivetendegrees','tentwentydegrees'))) %>% 
+  filter(
+         froi == frois[i]) %>% 
+  ggplot(aes(x=Age, y=percentage, color = Eccentricity, fill = Eccentricity)) +
+  geom_violin(position = position_dodge(.8)) +
+  stat_summary(fun = mean,
+               geom = "point",
+               position = position_dodge(.8),
+               size = .5,
+               color = "black") +
+   stat_summary(
+    fun.data = "mean_se",
+    geom = "linerange",
+    position = position_dodge(.8),
+  color = "black") +
+  scale_color_manual(values =c("#cf0c02","#31cc02","#0163b3")) +
+  scale_fill_manual(values =c("#cf0c02","#31cc02","#0163b3")) +
+  ylab("Percentage") +
+  theme(
+        aspect.ratio = .9,
+        legend.position = "none",
+        text = element_text(size = 14)) + 
+  coord_cartesian(ylim = c(0,100)) 
+  
+  outpath='../figures/4_rh_eccentricity/'
+   ggsave(
+      filename =
+        paste0(outpath, paste0(frois[i],'.png')),
+      width =2,
+      height = 1.75
+    )
+}
+
+```
+

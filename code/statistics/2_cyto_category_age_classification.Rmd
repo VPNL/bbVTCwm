@@ -1,0 +1,120 @@
+---
+title: "Cyto & Category & Age Classification"
+author: "Emily Kubota"
+date: "7/26/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+
+# these options here change the formatting of how comments are rendered
+opts_chunk$set(
+  comment = "",
+  results = "hold",
+  fig.show = "hold")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+# Read in the data 
+
+df_accuracy = read_csv("../../data/df_accuracy.csv",
+                       col_types = cols())
+
+```
+
+```{r}
+
+# Mean and SD classification for cyto classification
+
+cyto_accuracy_by_sub <-
+df_accuracy  %>% 
+  filter(classifcation == "cyto") %>% 
+  group_by(sub) %>% 
+  summarize(accuracy = as.numeric(mean(accuracy))) 
+
+cyto_accuracy_by_sub %>% 
+  ungroup() %>% 
+  summarize(mean_accuracy = mean(accuracy),
+            sd_accuracy = sd(accuracy)) 
+
+```
+
+```{r}
+
+# One sample t-test for cyto classification 
+
+t.test(cyto_accuracy_by_sub$accuracy, mu=.33)
+
+```
+
+```{r}
+
+# Mean and SD classification for category classification
+
+category_accuracy_by_sub <-
+df_accuracy  %>% 
+  filter(classifcation == "category") %>% 
+  group_by(sub) %>% 
+  summarize(accuracy = as.numeric(mean(accuracy))) 
+
+category_accuracy_by_sub %>% 
+  ungroup() %>% 
+  summarize(mean_accuracy = mean(accuracy),
+            sd_accuracy = sd(accuracy)) 
+
+```
+
+```{r}
+
+# One sample t-test for category classification 
+
+t.test(category_accuracy_by_sub$accuracy, mu=.33)
+
+```
+
+```{r}
+
+# Mean and SD classification for age classification
+
+age_accuracy_by_sub <-
+df_accuracy  %>% 
+  filter(classifcation == "age") %>% 
+  group_by(sub) %>% 
+  summarize(accuracy = as.numeric(mean(accuracy))) 
+
+age_accuracy_by_sub %>% 
+  ungroup() %>% 
+  summarize(mean_accuracy = mean(accuracy),
+            sd_accuracy = sd(accuracy)) 
+
+```
+
+```{r}
+
+# One sample t-test for age classification 
+
+t.test(age_accuracy_by_sub$accuracy, mu=.25)
+
+```
+
+
+```{r}
+
+# Binomial logistic regression with classification type 
+
+df_accuracy <-
+df_accuracy %>% 
+  mutate(classifcation = fct_relevel(classifcation, "cyto","category","age"))
+
+mylogit <- glm(accuracy ~ classifcation, data = df_accuracy, family = "binomial")
+
+mylogit %>% summary()
+
+
+```

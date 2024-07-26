@@ -1,0 +1,126 @@
+---
+title: "Distance control"
+author: "Emily Kubota"
+date: "7/25/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+
+
+# these options here change the formatting of how comments are rendered
+opts_chunk$set(
+  comment = "",
+  results = "hold",
+  fig.show = "hold")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+# Read in the data 
+
+df_dist = read_csv("../../data/physical_distance.csv",
+                       col_types = cols())
+
+df_classification = read_csv("../../data/distance_control.csv",
+                       col_types = cols())
+
+```
+
+```{r}
+df_dist_long <-
+df_dist %>% 
+  pivot_longer(cols = c("within_fg4","fg4_fg2"), 
+               names_to = "Cytoarchitecture",
+               values_to = "Distance")
+```
+
+```{r}
+# Plot out physical distance between the control regions 
+
+df_dist_long %>% 
+  mutate(Cytoarchitecture = recode(Cytoarchitecture,
+                                    'within_fg4' = 'Within',
+                                    'fg4_fg2' = 'Between')) %>% 
+  ggplot(aes(x=Cytoarchitecture,y=Distance)) +
+    stat_summary(fun = "mean",
+                 geom = "bar") +
+    stat_summary(
+      fun.data = "mean_se",
+      geom = "linerange",
+      size = 1,
+      color = "black"
+    ) +
+  ylab("Distance (mm)") +
+  theme(aspect.ratio = .75)
+
+ggsave(
+      filename = '../figures/2_distance_control/distance.png',
+      width = 3,
+      height = 3
+    )
+```
+```{r}
+# T-test comparing distance within/between cyto areas 
+
+t.test(df_dist$within_fg4,df_dist$fg4_fg2,paired = TRUE)
+```
+
+```{r}
+# Plot classification accuracy 
+
+df_classification <-
+  df_classification %>% 
+  mutate(Accuracy = as.numeric(cyto == predicted_cyto),
+         Cytoarchitecture = as.factor(cyto))
+
+df_classification %>% 
+  mutate(Cytoarchitecture = recode(Cytoarchitecture,
+                                   '2' = 'FG2',
+                                   '4' = 'FG4')) %>% 
+  ggplot(aes(x=Cytoarchitecture,y=Accuracy,fill=Cytoarchitecture)) +
+    stat_summary(fun = "mean",
+                 geom = "bar") +
+    stat_summary(
+      fun.data = "mean_se",
+      geom = "linerange",
+      size = 1,
+      color = "black"
+    ) +
+  scale_fill_manual(values =c("cyan","magenta")) +
+  theme(aspect.ratio = .75,
+        legend.position = "none") +
+  geom_hline(yintercept = .5,linetype = 2)
+
+ggsave(
+      filename = '../figures/2_distance_control/classification_accuracy.png',
+      width = 3,
+      height = 3
+    )
+```
+
+```{r}
+# T-test to test if classification is above chance
+
+df_accuracy_by_session <-
+df_classification %>% 
+  group_by(sub) %>% 
+  summarize(Accuracy = mean(Accuracy))
+
+t.test(df_accuracy_by_session$Accuracy,mu = .5)
+```
+
+```{r}
+# Calculate overall mean + sd accuracy 
+
+means <-
+df_accuracy_by_session %>% 
+  summarize(mean_accuracy = mean(Accuracy),
+            sd_accuracy = sd(Accuracy))
+```
+

@@ -1,0 +1,261 @@
+---
+title: "Eccentricity"
+author: "Emily Kubota"
+date: "7/26/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+library("lmerTest")
+
+
+# these options here change the formatting of how comments are rendered
+opts_chunk$set(
+  comment = "",
+  results = "hold",
+  fig.show = "hold")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+# Read in the data 
+
+df = read_csv("../../data/eccentricity.csv",
+                       col_types = cols())
+
+df <- 
+  df %>% 
+  drop_na()
+```
+
+```{r}
+# fit linear model 
+
+df %>% 
+  filter(
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  mutate(log10age = log10(as.numeric(age_days))) %>% 
+ lm('percentage ~ cyto * category * age',.) %>% 
+  anova()
+
+
+```
+
+```{r}
+# get means for each cyto area
+
+cyto_means <-
+df %>% 
+  filter(
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  group_by(cyto) %>% 
+  summarize(mean_percentage = mean(percentage),
+            sd_percentage = sd(percentage))
+
+
+```
+
+```{r}
+# get means for each category
+
+category_means <-
+df %>% 
+  filter(
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  group_by(category) %>% 
+  summarize(mean_percentage = mean(percentage),
+            sd_percentage = sd(percentage))
+
+
+```
+
+```{r}
+# Post-hoc tests for cytoarchitecture x category interaction (FG2)
+
+fg2_face <- df %>% 
+  filter(
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  filter(cyto == "FG2",
+         category == "face") 
+
+fg2_word <- df %>% 
+  filter(
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  filter(cyto == "FG2",
+         category == "word") 
+
+t.test(fg2_face$percentage,fg2_word$percentage, paired = TRUE)
+
+```
+
+```{r}
+# Post-hoc tests for cytoarchitecture x category interaction (FG4)
+
+fg4_face <- df %>% 
+  filter(
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  filter(cyto == "FG4",
+         category == "face") 
+
+fg4_word <- df %>% 
+  filter(
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  filter(cyto == "FG4",
+         category == "word") 
+
+fg4_body <- df %>% 
+  filter(
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  filter(cyto == "FG4",
+         category == "body") 
+
+```
+
+```{r}
+
+# face vs word (FG4)
+
+t.test(fg4_face$percentage,fg4_word$percentage, paired = TRUE)
+
+```
+
+```{r}
+
+# face vs body (FG4)
+
+t.test(fg4_face$percentage,fg4_body$percentage, paired = TRUE)
+
+```
+
+```{r}
+
+# body vs word (FG4)
+
+
+t.test(fg4_body$percentage,fg4_word$percentage, paired = TRUE)
+
+```
+```{r}
+# Development within each cyto area (FG2)
+df %>% 
+  filter(cyto == "FG2",
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  mutate(log10age = log10(as.numeric(age_days))) %>% 
+  lmerTest::lmer('percentage ~ log10age + (1 | subj)',.) %>% 
+  summary()
+
+```
+
+```{r}
+
+# Development within each cyto area (FG3)
+
+df %>% 
+  filter(cyto == "FG3",
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  mutate(log10age = log10(as.numeric(age_days))) %>% 
+  lmerTest::lmer('percentage ~ log10age + (1 | subj)',.) %>% 
+  summary()
+
+```
+
+```{r}
+
+# Development within each cyto area (FG4)
+
+df %>% 
+  filter(cyto == "FG4",
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  mutate(log10age = log10(as.numeric(age_days))) %>% 
+  lmerTest::lmer('percentage ~ log10age + (1 | subj)',.) %>% 
+  summary()
+
+```
+
+
+
+```{r}
+# Development within each fROI 
+
+df %>% 
+  filter(froi == "pFus",
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  mutate(log10age = log10(as.numeric(age_days))) %>% 
+  lmerTest::lmer('percentage ~ log10age + (1 | subj)',.) %>% 
+  summary()
+
+```
+
+```{r}
+
+df %>% 
+  filter(froi == "pOTS",
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  mutate(log10age = log10(as.numeric(age_days))) %>% 
+  lmerTest::lmer('percentage ~ log10age + (1 | subj)',.) %>% 
+  summary()
+
+```
+
+```{r}
+
+df %>% 
+  filter(froi == "CoS",
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  mutate(log10age = log10(as.numeric(age_days))) %>% 
+  lmerTest::lmer('percentage ~ log10age + (1 | subj)',.) %>% 
+  summary()
+
+```
+
+```{r}
+df %>% 
+  filter(froi == "mFus",
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  mutate(log10age = log10(as.numeric(age_days))) %>% 
+  lmerTest::lmer('percentage ~ log10age + (1 | subj)',.) %>% 
+  summary()
+
+```
+
+```{r}
+df %>% 
+  filter(froi == "OTS",
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  mutate(log10age = log10(as.numeric(age_days))) %>% 
+  lmerTest::lmer('percentage ~ log10age + (1 | subj)',.) %>% 
+  summary()
+
+```
+
+```{r}
+df %>% 
+  filter(froi == "mOTS",
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  mutate(log10age = log10(as.numeric(age_days))) %>% 
+  lmerTest::lmer('percentage ~ log10age + (1 | subj)',.) %>% 
+  summary()
+
+```

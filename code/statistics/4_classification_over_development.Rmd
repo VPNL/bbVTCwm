@@ -1,0 +1,45 @@
+---
+title: "Classification over development"
+author: "Emily Kubota"
+date: "5/24/2023"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+
+
+# these options here change the formatting of how comments are rendered
+opts_chunk$set(
+  comment = "",
+  results = "hold",
+  fig.show = "hold")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+# Read in the data 
+
+df_accuracy = read_csv("../../data/df_accuracy.csv",
+                       col_types = cols())
+
+```
+
+```{r}
+
+# Filter for cyto and category classification only 
+
+df_accuracy_cc <- 
+  df_accuracy %>% 
+  filter(classifcation %in% c("cyto","category")) 
+
+
+mylogit <- glm(accuracy ~ classifcation + age, data = df_accuracy_cc, family = "binomial")
+
+mylogit %>% summary()
+
+```

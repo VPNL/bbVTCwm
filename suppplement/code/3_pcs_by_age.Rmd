@@ -1,0 +1,267 @@
+---
+title: "PCs by age"
+author: "Emily Kubota"
+date: "7/25/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+library("patchwork") # for subplots
+
+
+# these options here change the formatting of how comments are rendered
+opts_chunk$set(
+  comment = "",
+  results = "hold",
+  fig.show = "hold")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+
+df = read_csv("../../data/pca.csv",
+              col_types = cols())
+df_accuracy = read_csv("../../data/df_accuracy.csv",
+                       col_types = cols())
+
+```
+
+
+
+```{r}
+a <- df %>% 
+  filter(age == "mri0") %>% 
+  mutate(PC1 = pc1,
+         PC2 = pc2,
+         Cyto = cyto) %>% 
+  ggplot(aes(x=PC1,y=PC2,color=Cyto)) +
+  geom_point(alpha = .5,
+             shape = 1) +
+  scale_color_manual(values=c("cyan","green","magenta")) +
+  ggtitle("Cyto") +
+  theme(aspect.ratio=1,
+        legend.position="none",
+        axis.line=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.text.y=element_blank(),
+        axis.ticks=element_blank()) +
+  geom_hline(yintercept = 0) + 
+  geom_vline(xintercept = 0) +
+  ggtitle("0 months") +
+  coord_cartesian(ylim = c(-.1,.11),xlim = c(-.13,0.18))
+
+```
+
+```{r}
+b <- df %>% 
+  filter(age == "mri3") %>% 
+  mutate(PC1 = pc1,
+         PC2 = pc2,
+         Cyto = cyto) %>% 
+  ggplot(aes(x=PC1,y=PC2,color=Cyto)) +
+  geom_point(alpha = .5,
+             shape = 1) +
+  scale_color_manual(values=c("cyan","green","magenta")) +
+  ggtitle("Cyto") +
+  theme(aspect.ratio=1,
+        legend.position="none",
+        axis.line=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.text.y=element_blank(),
+        axis.ticks=element_blank()) +
+  geom_hline(yintercept = 0) + 
+  geom_vline(xintercept = 0) +
+  ggtitle("3 months") +
+  coord_cartesian(ylim = c(-.1,.11),xlim = c(-.13,0.18))
+
+```
+
+```{r}
+c <- df %>% 
+  filter(age == "mri6") %>% 
+  mutate(PC1 = pc1,
+         PC2 = pc2,
+         Cyto = cyto) %>% 
+  ggplot(aes(x=PC1,y=PC2,color=Cyto)) +
+  geom_point(alpha = .5,
+             shape = 1) +
+  scale_color_manual(values=c("cyan","green","magenta")) +
+  ggtitle("Cyto") +
+  theme(aspect.ratio=1,
+        legend.position="none",
+        axis.line=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.text.y=element_blank(),
+        axis.ticks=element_blank()) +
+  geom_hline(yintercept = 0) + 
+  geom_vline(xintercept = 0) +
+  ggtitle("6 months") +
+  coord_cartesian(ylim = c(-.1,.11),xlim = c(-.13,0.18))
+
+```
+
+```{r}
+d <- df %>% 
+  filter(age == "adult_multishell") %>% 
+  mutate(PC1 = pc1,
+         PC2 = pc2,
+         Cyto = cyto) %>% 
+  ggplot(aes(x=PC1,y=PC2,color=Cyto)) +
+  geom_point(alpha = .5,
+             shape = 1) +
+  scale_color_manual(values=c("cyan","green","magenta")) +
+  ggtitle("Cyto") +
+  theme(aspect.ratio=1,
+        legend.position="none",
+        axis.line=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.text.y=element_blank(),
+        axis.ticks=element_blank()) +
+  geom_hline(yintercept = 0) + 
+  geom_vline(xintercept = 0) +
+  ggtitle("Adults") +
+  coord_cartesian(ylim = c(-.1,.11),xlim = c(-.13,0.18))
+
+```
+
+
+
+```{r}
+e <- df %>% 
+  filter(age == "mri0") %>% 
+  mutate(PC1 = pc1,
+         PC2 = pc2,
+         Category = as.factor(category)) %>% 
+  mutate(Category = fct_relevel(Category, c("face","word","body","place"))) %>% 
+  ggplot(aes(x=PC1,y=PC2,color=Category)) +
+  geom_point(alpha = .5,
+              shape = 1) +
+  scale_color_manual(values=c("red","blue","#ffd900","#007f00")) +
+  ggtitle("Category") +
+  theme(aspect.ratio=1,
+        legend.position="none",
+        axis.line=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.text.y=element_blank(),
+        axis.ticks=element_blank()) +
+  geom_hline(yintercept = 0) + 
+  geom_vline(xintercept = 0) +
+  ggtitle("0 months")+
+  coord_cartesian(ylim = c(-.1,.11),xlim = c(-.13,0.18))
+
+```
+
+```{r}
+f <- df %>% 
+  filter(age == "mri3") %>% 
+  mutate(PC1 = pc1,
+         PC2 = pc2,
+         Category = as.factor(category)) %>% 
+  mutate(Category = fct_relevel(Category, c("face","word","body","place"))) %>% 
+  ggplot(aes(x=PC1,y=PC2,color=Category)) +
+  geom_point(alpha = .5,
+              shape = 1) +
+  scale_color_manual(values=c("red","blue","#ffd900","#007f00")) +
+  ggtitle("Category") +
+  theme(aspect.ratio=1,
+        legend.position="none",
+        axis.line=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.text.y=element_blank(),
+        axis.ticks=element_blank()) +
+  geom_hline(yintercept = 0) + 
+  geom_vline(xintercept = 0) +
+  ggtitle("3 months") +
+  coord_cartesian(ylim = c(-.1,.11),xlim = c(-.13,0.18))
+
+```
+
+```{r}
+g <- df %>% 
+  filter(age == "mri6") %>% 
+  mutate(PC1 = pc1,
+         PC2 = pc2,
+         Category = as.factor(category)) %>% 
+  mutate(Category = fct_relevel(Category, c("face","word","body","place"))) %>% 
+  ggplot(aes(x=PC1,y=PC2,color=Category)) +
+  geom_point(alpha = .5,
+              shape = 1) +
+  scale_color_manual(values=c("red","blue","#ffd900","#007f00")) +
+  ggtitle("Category") +
+  theme(aspect.ratio=1,
+        legend.position="none",
+        axis.line=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.text.y=element_blank(),
+        axis.ticks=element_blank()) +
+  geom_hline(yintercept = 0) + 
+  geom_vline(xintercept = 0) +
+  ggtitle("6 months") +
+  coord_cartesian(ylim = c(-.1,.11),xlim = c(-.13,0.18))
+
+```
+
+```{r}
+h <- df %>% 
+  filter(age == "adult_multishell") %>% 
+  mutate(PC1 = pc1,
+         PC2 = pc2,
+         Category = as.factor(category)) %>% 
+  mutate(Category = fct_relevel(Category, c("face","word","body","place"))) %>% 
+  ggplot(aes(x=PC1,y=PC2,color=Category)) +
+  geom_point(alpha = .5,
+              shape = 1) +
+  scale_color_manual(values=c("red","blue","#ffd900","#007f00")) +
+  ggtitle("Category") +
+  theme(aspect.ratio=1,
+        legend.position="none",
+        axis.line=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.text.y=element_blank(),
+        axis.ticks=element_blank()) +
+  geom_hline(yintercept = 0) + 
+  geom_vline(xintercept = 0) +
+  ggtitle("Adults") +
+  coord_cartesian(ylim = c(-.1,.11),xlim = c(-.13,0.18))
+
+```
+
+```{r}
+
+
+(a | b | c | d)/(e | f | g | h)
+
+outpath='../figures/'
+   ggsave(
+      filename =
+        paste0(outpath, '../figures/3_pcs_by_age/pcs_by_age.png'),
+      width = 6,
+      height = 4
+    )
+
+```
+
+```{r}
+cyto_by_age <-
+df_accuracy %>% 
+  filter(classifcation == "cyto") %>% 
+  group_by(age) %>% 
+  summarize(mean_accuracy = mean(as.numeric(accuracy)),
+            sd_accuracy = sd(as.numeric(accuracy)))
+
+```
+
+```{r}
+category_by_age <-
+df_accuracy %>% 
+  filter(classifcation == "category") %>% 
+  group_by(age) %>% 
+  summarize(mean_accuracy = mean(as.numeric(accuracy)),
+            sd_accuracy = sd(as.numeric(accuracy)))
+
+```

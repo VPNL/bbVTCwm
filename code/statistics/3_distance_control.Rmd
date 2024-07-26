@@ -1,0 +1,54 @@
+---
+title: "Distance control"
+author: "Emily Kubota"
+date: "7/26/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+
+
+# these options here change the formatting of how comments are rendered
+opts_chunk$set(
+  comment = "",
+  results = "hold",
+  fig.show = "hold")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+# Read in the data 
+
+df = read_csv("../../data/distance_control.csv",
+                       col_types = cols())
+
+```
+
+```{r}
+
+# get the mean accuracy and sd
+
+cyto_accuracy <-
+  df %>% 
+  mutate(accuracy = predicted_cyto == cyto,
+         true_label = cyto) %>% 
+  select(accuracy,age,sub,true_label) %>% 
+  mutate(classifcation='cyto')
+
+cyto_accuracy_by_sub <-
+cyto_accuracy  %>% 
+  group_by(sub) %>% 
+  summarize(accuracy = mean(accuracy)) 
+
+cyto_accuracy_by_sub %>% 
+  summarize(mean_accuracy = mean(accuracy),
+            sd_accuracy = sd(accuracy)) 
+
+t.test(cyto_accuracy_by_sub$accuracy, mu=.5)
+
+```

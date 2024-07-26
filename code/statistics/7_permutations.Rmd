@@ -1,0 +1,66 @@
+---
+title: "Slope stats"
+author: "Emily Kubota"
+date: "7/26/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+
+# these options here change the formatting of how comments are rendered
+opts_chunk$set(
+  comment = "",
+  results = "hold",
+  fig.show = "hold")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+# Read in the data 
+
+df = read_csv("../../data/slope_permutations_correlations.csv",
+                       col_types = cols())
+
+```
+
+```{r}
+
+# Fisher transform correlation values 
+
+df <-
+df %>% 
+  mutate(fisher_cor = FisherZ(correlation))
+```
+
+```{r}
+
+# fit the model
+
+lm('fisher_cor ~ same_cyto * same_category',df) %>% 
+  anova()
+
+
+```
+```{r}
+# Mean and standard deviation within/across cyto areas 
+cyto_means <-
+df %>% 
+  group_by(same_cyto) %>% 
+  summarize(mean_cor = mean(correlation),
+            sd_cor = sd(correlation))
+```
+
+```{r}
+# Mean and standard deviation within/across category 
+
+category_means <-
+df %>% 
+  group_by(same_category) %>% 
+  summarize(mean_cor = mean(correlation),
+            sd_cor = sd(correlation))
+```

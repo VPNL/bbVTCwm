@@ -1,0 +1,48 @@
+---
+title: "fROI size"
+author: "Emily Kubota"
+date: "7/26/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+
+
+# these options here change the formatting of how comments are rendered
+opts_chunk$set(
+  comment = "",
+  results = "hold",
+  fig.show = "hold")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+# Read in the data 
+
+df = read_csv("../../data/froi_size.csv",
+              col_types = cols())
+
+```
+
+```{r}
+df <-
+df %>% 
+  mutate(sub_name = str_split_i(sub,'_',1))
+
+```
+
+
+```{r}
+df <-
+  df %>% 
+  mutate(log10age = log10(as.numeric(age_days)))
+
+lm('size_normed ~ log10age',df) %>% 
+  summary() 
+
+```
