@@ -45,5 +45,6 @@ cuda 9.1
 AFQ
 mrTrix3
 https://github.com/VPNL/fat
+https://github.com/cvnlab/cvncode
 
 ```
