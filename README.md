@@ -9,7 +9,9 @@ organized by cytoarchitecture, eccentricity, and category-selectivity from birth
 This repository contains code to analyze the data, compute statistics, and make the individual figure elements. 
 
 #### Overall organization 
-`code` folder contains the R code used to generate all other figures and statistics in the `figures/` and `statistics/` subdirectories.
+`code` folder contains the R code used to generate all other figures and statistics in the `figures/` and `statistics/` subdirectories. 
+
+The `analyses/` subdirectory contains code used to preprocess diffusion data, intersect connectomes with fROIs, quantify connectivity profiles, and perform PCA.
 
 `data` includes the processed data used for figure generation and statistics.
 
@@ -28,5 +30,17 @@ lmerTest
 patchwork
 viridis 
 ggcorrplot
+
+```
+
+```
+For preprocessing
+
+MATLAB 2015a
+Freesurfer v7.0 
+ANTS
+cuda 9.1
+AFQ
+mrTrix3
 
 ```
