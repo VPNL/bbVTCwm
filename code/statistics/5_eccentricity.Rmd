@@ -9,13 +9,6 @@ output: pdf_document
 library("tidyverse") # for all things tidyverse
 library("lmerTest")
 
-
-# these options here change the formatting of how comments are rendered
-opts_chunk$set(
-  comment = "",
-  results = "hold",
-  fig.show = "hold")
-
 # set the default ggplot theme 
 theme_set(theme_classic())
 
