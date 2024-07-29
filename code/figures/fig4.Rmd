@@ -1,0 +1,77 @@
+---
+title: "Fig 4"
+author: "Emily Kubota"
+date: "7/26/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+# Read in the data 
+
+df = read_csv("../../data/endpoints.csv",
+              col_types = cols())
+
+
+```
+
+```{r}
+df <-
+  df %>%
+  filter(hem == "lh",
+         Lobe != "ventral")
+
+glasser_rois = unique(df$glasser_roi)
+frois = unique(df$froi)
+
+for (froi_name in frois) {
+  glasser_holder = c()
+  froi_holder = c()
+  slope_holder = c()
+  pval_holder = c()
+  rsquared_holder = c()
+  standard_error_holder = c()
+  
+  for (glasser in glasser_rois) {
+    foo <- df %>%
+      filter(froi == froi_name,
+             glasser_roi == glasser) %>%
+      lm(endpoint_density ~ log_age, .)
+    foo2 <- foo %>% summary()
+    pval = foo2$coefficients[2, 4]
+    standard_error = foo2$coefficients[2,2]
+    slope = unname(foo$coefficients[2])
+    r_squared = foo2$r.squared
+    
+      glasser_holder <- append(glasser_holder, glasser)
+      froi_holder <- append(froi_holder, froi_name)
+      slope_holder <- append(slope_holder, slope)
+      pval_holder <- append(pval_holder, pval)
+      rsquared_holder = append(rsquared_holder,r_squared)
+      standard_error_holder = append(standard_error_holder,standard_error)
+  }
+  df_slope = tibble(glasser = glasser_holder,
+                      froi = froi_holder,
+                      slope = slope_holder,
+                      pval = pval_holder,
+                      rsquared = rsquared_holder,
+                      standard_error = standard_error_holder)
+  write.csv(
+    df_slope,
+    paste0(
+      '../../figures/fig4/lh_',
+      froi_name,
+      '.csv'
+    )
+  )
+}
+
+```
