@@ -31,8 +31,8 @@ frois = {'mFus','pFus','OTS','PPA'};
 crange=[-.00045, .00045];
 
 views={'lateral','medial'};
-
-working_dir = '/path/to/bbVTCwm/supplement/code';
+base_path = '/path/to/bbVTCwm';
+working_dir = fullfile(base_path,'supplement/code');
 
 for v = 1:length(views)
     for r = 1:length(frois)
@@ -46,9 +46,9 @@ for v = 1:length(views)
             colorList = [colorList;{hex}];
             labelList = [labelList;strcat('glasserAtlas/',T.glasser(i))];
         end
-        figdir='/path/to/bbVTCwm/suppplement/figures/5_rh_slopes'; 
+        figdir=fullfile(base_path, 'supplement/figures/5_rh_slopes'); 
         fname=fullfile(figdir,['rh_',frois{r},'_',views{v},'.png']);
-        freesurfer_takescreenshots('fsaverage_cyto','rh', labelList, colorList, views{v}, fname)
+        freesurfer_takescreenshots('fsaverage','rh', labelList, colorList, views{v}, fname)
         cd(working_dir)
     end
 end

@@ -19,16 +19,15 @@ function freesurfer_takescreenshots(FSSubj, hemi, labelList, colorList, view, fn
 % Set here the view settings, this is for ventral view
 if strcmp(view, 'ventral')
     settingsView = ' -cam dolly 1.2 azimuth 180 elevation 270 roll 270';
-elseif strcmp(view, 'lateral') 
-    %XY: this is medial if in the right hemi
-%    settingsView = ' -cam dolly 1.2 azimuth 10 elevation -21 roll 0';
+elseif strcmp(view, 'lateral') && strcmp(hemi,'lh')
     settingsView = ' -cam dolly 1.2 azimuth 0 elevation 0 roll 0';
-elseif strcmp(view,'posterior')
-    settingsView = ' -cam dolly 1.2 azimuth 65 elevation 0 roll 0';
-elseif strcmp(view,'medial')
-    %XY: this is lateral if in the right hemi
+elseif strcmp(view,'medial') && strcmp(hemi,'lh')
     settingsView = ' -cam dolly 1.2 azimuth 180 elevation 0 roll 0';
-else 
+elseif strcmp(view, 'lateral') && strcmp(hemi,'rh')
+    settingsView = ' -cam dolly 1.2 azimuth 180 elevation 0 roll 0';  
+elseif strcmp(view,'medial') && strcmp(hemi,'rh')
+    settingsView = ' -cam dolly 1.2 azimuth 0 elevation 0 roll 0'; 
+else
     sprintf('THis view has not yet been defined. Choose ventral or lateral')
 end
 
@@ -41,27 +40,18 @@ screenshotCmd = ' -ss screenshot';
 %% directory
 FSDir = getenv('SUBJECTS_DIR');
 % move into subj directory
-cd([FSDir FSSubj])
+cd(fullfile(FSDir,FSSubj))
 
 freeviewCMD = sprintf('freeview -f surf/%s.inflated:curvature_method=binary', hemi);
 
 %% load map and label if applicable on surface in freeview, set 3d view  and rotate to  view, take screenshot
-if ~isempty(mapName)
-%     % Setting to threshold overlay at 3 and don't show negative vals
-%     % overlayThreshold = ':overlay_threshold=0.00000610344,.00006:overlay_color=heat' ;
-%     overlayThreshold = ':overlay_threshold=0.00000610344,.0003:overlay_color=colorwheel' ;
-%     freeviewCMD = [freeviewCMD sprintf(':overlay=%s.mgh%s',  mapName, overlayThreshold)] ;
-    freeviewCMD = [freeviewCMD sprintf(':overlay=%s.mgh%s',  mapName)] ;
-end
+
 if ~isempty(labelList)
     labelCMD ='';
     for l=1:length(labelList)
         labelName=labelList{l};
          colorname=colorList{l};
          
-         %colorname = 'white';
-      
-%          labelCMD = [labelCMD sprintf(':label=label/rosenke_visfAtlas/%s%s:label_color=%s', labelName,labelOutlineFlag, colorname)];
          labelCMD = [labelCMD sprintf(':label=label/%s%s:label_color=%s', labelName,labelOutlineFlag, colorname)];
     end
 
