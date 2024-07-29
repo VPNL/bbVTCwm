@@ -20,9 +20,8 @@ topupDir = '/oak/stanford/groups/kalanit/biac2/kgs/projects/bbDWI_development/co
 fsDir = '/oak/stanford/groups/kalanit/biac2/kgs/projects/anatomy/freesurferRecon/babybrains';
 addpath(genpath(codeDir))
 setenv('SUBJECTS_DIR',fsDir)
-T = setSessionbbDwi;
+T = readtable('../../../data/sessions.csv');
 runName={'IFOD2_5mil'};
-T = bbDiffusion_getProcessedSubs(T,runName); % gives the list consistent with Kubota et al. 2024
 
 sessid = T.sessid;
 dataset_yr = T.year;
