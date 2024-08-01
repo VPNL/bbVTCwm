@@ -28,18 +28,18 @@ colormap = [0.2857917366747387, 0.5169848269105909, 0.30613859860653175;
  0.7252302500744878, 0.3184460673074281, 0.5877857569907117];
 
 frois = {'mFus','mOTS','pOTS','pFus','OTS','PPA'};
-crange=[-.00045, .00045];
+crange=[-.0005, .0005];
 
 views={'lateral','medial'};
 
-working_dir = '/path/to/bbVTCwm/figures';
+working_dir = '/oak/stanford/groups/kalanit/biac2/kgs/projects/emily/smooth_tiling/bbVTCwm/figures';
 
 for v = 1:length(views)
     for r = 1:length(frois)
         cd(working_dir)
         labelList = [];
         colorList = [];
-        T = readtable(fullfile('../data/fig4_slopes/',['lh_',frois{r},'.csv']));
+        T = readtable(fullfile('/oak/stanford/groups/kalanit/biac2/kgs/projects/emily/smooth_tiling/bbVTCwm/data/fig4_slopes/',['lh_',frois{r},'.csv']));
         for i=1:height(T)
             rgb=vals2colormap(T.slope(i),colormap,crange); % AFQ function
             hex = rgb2hex(rgb); % matlab file exchange 
@@ -47,7 +47,7 @@ for v = 1:length(views)
             labelList = [labelList;strcat('glasserAtlas/',T.glasser(i))];
         end
         fname=fullfile(working_dir,'fig4',['lh_',frois{r},'_',views{v},'.png']);
-        freesurfer_takescreenshots('fsaverage','lh', labelList, colorList, views{v}, fname)
+        freesurfer_takescreenshots('fsaverage_cyto','lh', labelList, colorList, views{v}, fname)
         cd(working_dir)
     end
 end
