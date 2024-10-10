@@ -42,7 +42,14 @@ df <-
   df %>% 
   mutate(log10age = log10(as.numeric(age_days)))
 
+fit <- lm('size_normed ~ log10age',df)
+
 lm('size_normed ~ log10age',df) %>% 
   summary() 
 
+```
+
+```{r}
+
+confint(fit, 'log10age', level=0.95)
 ```

@@ -1,0 +1,66 @@
+---
+title: "Longitudinal Visits"
+author: "Emily Kubota"
+date: "9/27/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+library("ggcorrplot") # for correlation plots
+library("viridis")
+
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+
+df = read_csv("../../data/bb_ages.csv",
+                       col_types = cols())
+
+
+df_sessions = read_csv("../../data/sessions.csv",
+                       col_types = cols())
+
+```
+
+```{r}
+df_sessions <-
+df_sessions %>% 
+  mutate(ID = subj,
+         timepoint = sess) %>% 
+  select(ID,timepoint)
+
+df <- merge(df_sessions,df)
+```
+
+```{r}
+df <-
+  df %>% 
+  mutate(age = as.numeric(age))
+
+df %>% 
+  ggplot(aes(x = age, y = ID)) +
+  geom_point() +
+  geom_vline(xintercept = 90,
+             linetype = 'dashed') +
+  geom_vline(xintercept = 180,
+             linetype = 'dashed') +
+  ylab('') +
+  xlab('Age (days)') +
+  theme(aspect.ratio = 2,
+        panel.grid.major.y = element_line(),
+        panel.grid.minor.y = element_line()) 
+
+ggsave(
+      filename = '../figures/1_longitudinal_visits/longitudinal_visits.png',
+      width = 3,
+      height = 5
+    )
+
+```
+

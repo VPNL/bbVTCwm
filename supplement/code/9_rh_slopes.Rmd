@@ -67,7 +67,7 @@ for (froi_name in frois) {
   write.csv(
     df_slope,
     paste0(
-      '../figures/5_rh_slopes/rh_',
+      '../figures/9_rh_slopes/rh_',
       froi_name,
       '.csv'
     )

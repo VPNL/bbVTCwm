@@ -73,7 +73,7 @@ df %>%
   outpath='../../figures/fig3/'
    ggsave(
       filename =
-        paste0(outpath, paste0(frois[i],'.png')),
+        paste0(outpath, paste0(frois[i],'.pdf')),
       width =2,
       height = 1.75
     )

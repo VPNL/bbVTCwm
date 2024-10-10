@@ -239,7 +239,7 @@ h <- df %>%
 outpath='../figures/'
    ggsave(
       filename =
-        paste0(outpath, '../figures/3_pcs_by_age/pcs_by_age.png'),
+        paste0(outpath, '../figures/6_pcs_by_age/pcs_by_age.png'),
       width = 6,
       height = 4
     )

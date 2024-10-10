@@ -134,7 +134,7 @@ matrix_holder %>%
   ggtitle("Age") 
 
 ggsave(
-      filename = '../figures/1_confusion_matrices/age_confusion.png',
+      filename = '../figures/3_confusion_matrices/age_confusion.png',
       width = 3,
       height = 3
     )

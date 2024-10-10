@@ -69,7 +69,7 @@ df %>%
         text = element_text(size = 14)) + 
   coord_cartesian(ylim = c(0,100)) 
   
-  outpath='../figures/4_rh_eccentricity/'
+  outpath='../figures/8_rh_eccentricity/'
    ggsave(
       filename =
         paste0(outpath, paste0(frois[i],'.png')),

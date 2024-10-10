@@ -1,0 +1,100 @@
+---
+title: "Classifier Boxplot"
+author: "Emily Kubota"
+date: "9/27/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("knitr") # for knitting things
+library("tidyverse") # for all things tidyverse
+library("patchwork") # for subplots
+library("nnet")
+library("DescTools")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+```
+
+```{r}
+dataPath = "../../data/df_accuracy.csv"
+
+df_accuracy = read_csv(dataPath,
+              col_types = cols())
+
+```
+
+
+```{r}
+# Mean and SD classification for cyto classification
+
+cyto_accuracy_by_sub <-
+df_accuracy  %>% 
+  filter(classifcation == "cyto") %>% 
+  group_by(sub) %>% 
+  summarize(accuracy = as.numeric(mean(accuracy)))  %>% 
+  mutate(classification_type = 'Cyto')
+```
+
+```{r}
+# Mean and SD classification for cyto classification
+
+category_accuracy_by_sub <-
+df_accuracy  %>% 
+  filter(classifcation == "category") %>% 
+  group_by(sub) %>% 
+  summarize(accuracy = as.numeric(mean(accuracy))) %>% 
+  mutate(classification_type = 'Category')
+```
+
+```{r}
+# Mean and SD classification for cyto classification
+
+age_accuracy_by_sub <-
+df_accuracy  %>% 
+  filter(classifcation == "age") %>% 
+  group_by(sub) %>% 
+  summarize(accuracy = as.numeric(mean(accuracy))) %>% 
+  mutate(classification_type = 'Age')
+```
+
+```{r}
+accuracy_by_sub <- rbind(cyto_accuracy_by_sub,category_accuracy_by_sub,age_accuracy_by_sub)
+
+```
+
+
+```{r}
+accuracy_by_sub %>% 
+  mutate(Classification = fct_relevel(classification_type, c("Category","Cyto","Age"))) 
+```
+
+```{r}
+# make the box plot
+accuracy_by_sub %>%
+  mutate(Classification = fct_relevel(classification_type, c("Category", "Cyto", "Age"))) %>%
+  ggplot(aes(x = Classification, y = accuracy)) +
+  geom_boxplot() +
+  xlab("") +
+  ylab("Classification Accuracy") +
+  theme(aspect.ratio = 1,
+        legend.position = "none") +
+coord_cartesian(ylim = c(0, 1))
+
+
+```
+
+
+```{r}
+outpath='../figures/2_classification_boxplot/'
+   ggsave(
+      filename =
+        paste0(outpath, 'classification_boxplot.png'),
+      width = 3,
+      height = 3
+    )
+
+```
+
+

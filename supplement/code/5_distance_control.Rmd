@@ -98,7 +98,7 @@ df_classification %>%
   geom_hline(yintercept = .5,linetype = 2)
 
 ggsave(
-      filename = '../figures/2_distance_control/classification_accuracy.png',
+      filename = '../figures/5_distance_control/classification_accuracy.png',
       width = 3,
       height = 3
     )

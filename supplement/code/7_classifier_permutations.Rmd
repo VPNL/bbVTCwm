@@ -1,0 +1,281 @@
+---
+title: "Classifier Permutations"
+author: "Emily Kubota"
+date: "9/27/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("knitr") # for knitting things
+library("tidyverse") # for all things tidyverse
+library("patchwork") # for subplots
+library("nnet")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+```
+
+```{r}
+dataPath = "../../data/pca.csv"
+
+df = read_csv(dataPath,
+              col_types = cols())
+
+```
+
+
+```{r}
+df <-
+df %>% 
+  mutate(subject_name = str_split_i(sub,'_',1))
+
+```
+
+
+```{r}
+
+# predict cyto 
+
+predicted_cyto = c()
+cyto_areas = c('FG2','FG3','FG4')
+
+for (i in 1:nrow(df)){
+  train_df = c()
+  # test df is the held out row only 
+  test_df <- df[c(i), ]
+  # train_df is all of the data minus the held out subjects data 
+  for (ca in 1:length(cyto_areas)){
+  train_df_tmp <- df %>% 
+    filter(subject_name != test_df$subject_name, 
+           cyto == cyto_areas[ca])
+  random_samples = sample(1:nrow(train_df_tmp),200, replace=T) #sample with replacement
+  train_df <- rbind(train_df,train_df_tmp[random_samples,])
+  }
+  # fit your model
+  model <- multinom(cyto ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10, data = train_df)
+  # make prediction for the held out data  
+  df_pred = predict(model, newdata = test_df, "probs")
+
+  foo <- df_pred[which.max(df_pred)]
+  predicted_cyto[i] <- names(foo)
+}
+
+df$predicted_cyto <- predicted_cyto
+
+```
+
+```{r}
+# predict category 
+
+predicted_category = c()
+categories = c('face', 'word', 'body', 'place')
+
+for (i in 1:nrow(df)) {
+  train_df = c()
+  # test df is the held out row only
+  test_df <- df[c(i),]
+  
+  # train_df is all of the data minus the held out subjects data
+  for (ca in 1:length(categories)) {
+    train_df_tmp <- df %>%
+      filter(subject_name != test_df$subject_name,
+             category == categories[ca])
+    random_samples = sample(1:nrow(train_df_tmp), 200, replace = T) #sample with replacement
+    train_df <- rbind(train_df, train_df_tmp[random_samples, ])
+  }
+  
+  # fit your model
+  model <-
+    multinom(category ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10, data = train_df)
+  # make prediction for the held out data
+  df_pred = predict(model, newdata = test_df, "probs")
+  
+  foo <- df_pred[which.max(df_pred)]
+  predicted_category[i] <- names(foo)
+}
+
+df$predicted_category <- predicted_category
+
+```
+
+```{r}
+df <- 
+  df %>% 
+  mutate(Age = recode(age,
+                      'mri0' = '0 months',
+                      'mri3' = '3 months',
+                      'mri6' = '6 months',
+                      'adult_multishell' = 'Adults'))
+```
+
+```{r}
+# predict age 
+
+predicted_age = c()
+ages = c('0 months', '3 months', '6 months', 'Adults')
+
+
+for (i in 1:nrow(df)){
+    train_df = c()
+
+  # test df is the held out row only 
+  test_df <- df[c(i), ]
+  
+  # train_df is all of the data minus the held out subjects data 
+  for (a in 1:length(ages)) {
+    train_df_tmp <- df %>%
+      filter(subject_name != test_df$subject_name,
+             Age == ages[a])
+    random_samples = sample(1:nrow(train_df_tmp), 200, replace = T) #sample with replacement
+    train_df <- rbind(train_df, train_df_tmp[random_samples, ])
+  }
+   
+  # fit your model
+  model <- multinom(Age ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10, data = train_df)
+  # make prediction for the held out data  
+  df_pred = predict(model, newdata = test_df, "probs")
+
+  foo <- df_pred[which.max(df_pred)]
+  predicted_age[i] <- names(foo)
+}
+
+df$predicted_age <- predicted_age
+
+```
+
+
+```{r}
+
+# write out the results as a table
+
+age_accuracy <-
+  df %>% 
+  mutate(accuracy = predicted_age == Age,
+         true_label = Age,
+         predicted_label = predicted_age) %>% 
+  select(accuracy,age,subject_name,sub,true_label,predicted_label) %>% 
+  mutate(classifcation='age')
+
+cyto_accuracy <-
+  df %>% 
+  mutate(accuracy = predicted_cyto == cyto,
+         true_label = cyto,
+         predicted_label = predicted_cyto) %>% 
+  select(accuracy,age,subject_name,sub,true_label,predicted_label) %>% 
+  mutate(classifcation='cyto')
+
+category_accuracy <-
+  df %>% 
+  mutate(accuracy = predicted_category == category,
+         true_label = category,
+         predicted_label = predicted_category) %>% 
+  select(accuracy,age,subject_name,sub,true_label,predicted_label) %>% 
+  mutate(classifcation='category')
+
+df_accuracy <- 
+  rbind(cyto_accuracy,category_accuracy,age_accuracy)
+
+#write.csv(df_accuracy, "../../data/df_accuracy_permutations.csv")
+```
+
+```{r}
+
+# Classification accuracy plot for cyto 
+
+a <-  df_accuracy %>% 
+  filter(classifcation == "cyto") %>% 
+  mutate(Accuracy = as.numeric(accuracy)) %>% 
+  ggplot(aes(x=true_label,y=Accuracy,fill = true_label)) +
+    stat_summary(fun = "mean",
+                 geom = "bar") +
+    stat_summary(
+      fun.data = "mean_se",
+      geom = "linerange",
+      size = 1,
+      color = "black"
+    ) +
+  scale_fill_manual(values=c("cyan","green","magenta")) +
+  ggtitle("Cyto") +
+  xlab("") +
+  geom_hline(yintercept = .33, linetype = 2) +
+  theme(aspect.ratio=1,
+        legend.position="none") +
+    coord_cartesian(ylim = c(0,1))
+
+
+```
+
+
+```{r}
+# Classification accuracy plot for category 
+
+b <- df_accuracy %>% 
+  filter(classifcation == "category") %>% 
+  mutate(Accuracy = as.numeric(accuracy),
+         true_label = fct_relevel(true_label, c("face","word","body","place"))) %>% 
+  ggplot(aes(x=true_label,y=Accuracy,fill = true_label)) +
+    stat_summary(fun = "mean",
+                 geom = "bar") +
+    stat_summary(
+      fun.data = "mean_se",
+      geom = "linerange",
+      size = 1,
+      color = "black"
+    ) +
+  scale_fill_manual(values=c("red","blue","#ffd900","#007f00")) +
+  ggtitle("Category") +
+  xlab("") +
+  geom_hline(yintercept = .25, linetype = 2) +
+  theme(aspect.ratio=1,
+        legend.position="none") +
+  coord_cartesian(ylim = c(0,1))
+
+
+```
+
+
+```{r}
+
+# Classification accuracy plot for age 
+
+c <- df_accuracy %>% 
+  filter(classifcation == "age") %>% 
+  mutate(Accuracy = as.numeric(accuracy),
+          true_label = recode(true_label,
+                      '0 months'='0M',
+                      '3 months'='3M',
+                      '6 months'='6M',
+                      'adult_multishell'='Adults')) %>% 
+   mutate(true_label = fct_relevel(true_label, c("0M","3M","6M","Adults"))) %>% 
+  ggplot(aes(x=true_label,y=Accuracy,fill = true_label)) +
+    stat_summary(fun = "mean",
+                 geom = "bar") +
+    stat_summary(
+      fun.data = "mean_se",
+      geom = "linerange",
+      size = 1,
+      color = "black"
+    ) +
+  ggtitle("Age") +
+  xlab("") +
+  geom_hline(yintercept = .25, linetype = 2) +
+  theme(aspect.ratio=1,
+        legend.position="none") +
+  coord_cartesian(ylim = c(0,1))
+```
+
+```{r}
+a+b+c
+
+outpath='../figures/7_classification_permutations/'
+   ggsave(
+      filename =
+        paste0(outpath, 'classification_permutations.png'),
+      width = 6,
+      height = 2
+    )
+
+```
+
+

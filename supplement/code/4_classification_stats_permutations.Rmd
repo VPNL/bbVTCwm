@@ -1,7 +1,7 @@
 ---
 title: "Cyto & Category & Age Classification"
 author: "Emily Kubota"
-date: "7/26/2024"
+date: "9/29/2024"
 output: pdf_document
 ---
 
@@ -23,7 +23,7 @@ theme_set(theme_classic())
 ```{r}
 # Read in the data 
 
-df_accuracy = read_csv("../../data/df_accuracy.csv",
+df_accuracy = read_csv("../../data/df_accuracy_permutations.csv",
                        col_types = cols())
 
 ```
@@ -54,20 +54,6 @@ t.test(cyto_accuracy_by_sub$accuracy, mu=.33)
 ```
 
 ```{r}
-# calcuate Cohen's d 
-
-cyto_means <-
-  cyto_accuracy_by_sub %>% 
-  ungroup() %>% 
-  summarize(mean_accuracy = mean(accuracy),
-            sd_accuracy = sd(accuracy)) 
-
-(cyto_means$mean_accuracy - .33) / cyto_means$sd_accuracy
-
-
-```
-
-```{r}
 
 # Mean and SD classification for category classification
 
@@ -93,20 +79,6 @@ t.test(category_accuracy_by_sub$accuracy, mu=.25)
 ```
 
 ```{r}
-# calcuate Cohen's d 
-
-category_means <-
-  category_accuracy_by_sub %>% 
-  ungroup() %>% 
-  summarize(mean_accuracy = mean(accuracy),
-            sd_accuracy = sd(accuracy)) 
-
-(category_means$mean_accuracy - .25) / category_means$sd_accuracy
-
-
-```
-
-```{r}
 
 # Mean and SD classification for age classification
 
@@ -128,20 +100,6 @@ age_accuracy_by_sub %>%
 # One sample t-test for age classification 
 
 t.test(age_accuracy_by_sub$accuracy, mu=.25)
-
-```
-
-```{r}
-# calcuate Cohen's d 
-
-age_means <-
-  age_accuracy_by_sub %>% 
-  ungroup() %>% 
-  summarize(mean_accuracy = mean(accuracy),
-            sd_accuracy = sd(accuracy)) 
-
-(age_means$mean_accuracy - .25) / age_means$sd_accuracy
-
 
 ```
 

@@ -52,3 +52,17 @@ cyto_accuracy_by_sub %>%
 t.test(cyto_accuracy_by_sub$accuracy, mu=.5)
 
 ```
+
+```{r}
+# calcuate Cohen's d 
+
+cyto_means <-
+  cyto_accuracy_by_sub %>% 
+  ungroup() %>% 
+  summarize(mean_accuracy = mean(accuracy),
+            sd_accuracy = sd(accuracy)) 
+
+(cyto_means$mean_accuracy - .5) / cyto_means$sd_accuracy
+
+
+```

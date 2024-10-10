@@ -42,10 +42,27 @@ df %>%
 # fit the model
 
 lm('fisher_cor ~ same_cyto * same_category',df) %>% 
-  anova()
+  summary()
+
+fit <- lm('fisher_cor ~ same_cyto * same_category',df)
 
 
 ```
+
+```{r}
+
+# get the confidence intervals
+
+confint(fit, 'same_cyto', level=0.95)
+```
+
+```{r}
+
+# get the confidence intervals
+
+confint(fit, 'same_category', level=0.95)
+```
+
 ```{r}
 # Mean and standard deviation within/across cyto areas 
 cyto_means <-

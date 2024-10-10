@@ -8,6 +8,7 @@ output: pdf_document
 ```{r setup, echo=FALSE, message=FALSE}
 library("tidyverse") # for all things tidyverse
 library("lmerTest")
+library("effectsize")
 
 # set the default ggplot theme 
 theme_set(theme_classic())
@@ -37,8 +38,18 @@ df %>%
  lm('percentage ~ cyto * category * age',.) %>% 
   anova()
 
-
+m <- df %>% 
+  filter(
+         eccen == "zerofivedegrees",
+         hem == "lh") %>% 
+  mutate(log10age = log10(as.numeric(age_days))) %>% 
+ lm('percentage ~ cyto * category * age',.)
+  
+effectsize::eta_squared(m)
+#confint(m)
 ```
+
+
 
 ```{r}
 # get means for each cyto area
@@ -87,9 +98,39 @@ fg2_word <- df %>%
   filter(cyto == "FG2",
          category == "word") 
 
+```
+
+```{r}
+# Post-hoc tests for cytoarchitecture x category interaction (FG2)
+
 t.test(fg2_face$percentage,fg2_word$percentage, paired = TRUE)
 
 ```
+
+```{r}
+
+# calcuate cohen's d 
+
+fg2_face_means <-
+  fg2_face %>% 
+  ungroup() %>% 
+  summarize(mean_percentage = mean(percentage),
+            sd_percentage = sd(percentage)) 
+
+fg2_word_means <-
+  fg2_word %>% 
+  ungroup() %>% 
+  summarize(mean_percentage = mean(percentage),
+            sd_percentage = sd(percentage)) 
+
+sd_pooled <- sqrt((fg2_face_means$sd_percentage^2 + fg2_word_means$sd_percentage^2)/2)
+
+(fg2_face_means$mean_percentage - fg2_word_means$mean_percentage) / sd_pooled
+
+
+```
+
+
 
 ```{r}
 # Post-hoc tests for cytoarchitecture x category interaction (FG4)
@@ -135,12 +176,36 @@ t.test(fg4_face$percentage,fg4_body$percentage, paired = TRUE)
 
 ```{r}
 
+# calcuate cohen's d 
+
+fg4_face_means <-
+  fg4_face %>% 
+  ungroup() %>% 
+  summarize(mean_percentage = mean(percentage),
+            sd_percentage = sd(percentage)) 
+
+fg4_body_means <-
+  fg4_body %>% 
+  ungroup() %>% 
+  summarize(mean_percentage = mean(percentage),
+            sd_percentage = sd(percentage)) 
+
+sd_pooled <- sqrt((fg4_face_means$sd_percentage^2 + fg4_body_means$sd_percentage^2)/2)
+
+(fg4_face_means$mean_percentage - fg4_body_means$mean_percentage) / sd_pooled
+
+
+```
+
+```{r}
+
 # body vs word (FG4)
 
 
 t.test(fg4_body$percentage,fg4_word$percentage, paired = TRUE)
 
 ```
+
 ```{r}
 # Development within each cyto area (FG2)
 df %>% 
