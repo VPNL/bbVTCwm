@@ -38,7 +38,6 @@ ggcorrplot
 ```
 For preprocessing and analyses
 
-MATLAB 2015a
 Freesurfer v7.0 
 ANTS
 cuda 9.1
