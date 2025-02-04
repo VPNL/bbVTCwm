@@ -7,13 +7,9 @@ output: pdf_document
 
 ```{r setup, echo=FALSE, message=FALSE}
 library("tidyverse") # for all things tidyverse
+library("ggcorrplot")
+library("viridis")
 
-
-# these options here change the formatting of how comments are rendered
-opts_chunk$set(
-  comment = "",
-  results = "hold",
-  fig.show = "hold")
 
 # set the default ggplot theme 
 theme_set(theme_classic())
@@ -48,8 +44,9 @@ df_dist_long %>%
                                     'within_fg4' = 'Within',
                                     'fg4_fg2' = 'Between')) %>% 
   ggplot(aes(x=Cytoarchitecture,y=Distance)) +
+  geom_violin() +
     stat_summary(fun = "mean",
-                 geom = "bar") +
+                 geom = "point") +
     stat_summary(
       fun.data = "mean_se",
       geom = "linerange",
@@ -57,10 +54,15 @@ df_dist_long %>%
       color = "black"
     ) +
   ylab("Distance (mm)") +
+  geom_point(alpha = 0.2,
+             position = position_jitter(width = 0.1,
+                                        height = 0),
+             size = 2) +
   theme(aspect.ratio = .75)
 
+
 ggsave(
-      filename = '../figures/2_distance_control/distance.png',
+      filename = '../figures/5_distance_control/distance.png',
       width = 3,
       height = 3
     )
@@ -69,6 +71,43 @@ ggsave(
 # T-test comparing distance within/between cyto areas 
 
 t.test(df_dist$within_fg4,df_dist$fg4_fg2,paired = TRUE)
+```
+
+```{r}
+# confusion matrix 
+
+row_names = c("FG2","FG4")
+col_names = rev(row_names)
+
+df_filtered <-
+  df_classification %>% 
+  mutate(true_label = recode(cyto, "2" = 'FG2', "4" = 'FG4'),
+         predicted_label = recode(predicted_cyto, "2" = 'FG2', "4" = 'FG4'))
+
+matrix_holder = matrix(, nrow = 2, ncol = 2)
+
+for (i in 1:length(row_names)){
+  for (j in 1:length(col_names)){
+    n = sum((df_filtered$true_label == col_names[j]) & (df_filtered$predicted_label == row_names[i]))
+    matrix_holder[i,j] = n/sum(df_filtered$true_label == col_names[j])*100
+  }
+}
+
+rownames(matrix_holder) <- c("FG2","FG4")
+colnames(matrix_holder) <- rev(c("FG2","FG4"))
+matrix_holder %>%
+    ggcorrplot(lab = TRUE,
+           lab_size = 2,
+      tl.cex = 12) +
+  scale_fill_viridis(limits = c(0, 100),
+                     name = "Percentage") 
+
+ggsave(
+      filename = '../figures/5_distance_control/confusion_matrix.png',
+      width = 3,
+      height = 3
+    )
+
 ```
 
 ```{r}

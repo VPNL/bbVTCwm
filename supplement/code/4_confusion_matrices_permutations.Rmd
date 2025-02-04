@@ -1,0 +1,136 @@
+---
+title: "Confusion Matrices Permutations"
+author: "Emily Kubota"
+date: "7/26/2024"
+output: pdf_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("tidyverse") # for all things tidyverse
+library("ggcorrplot") # for correlation plots
+library("viridis")
+
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+
+```
+
+```{r}
+
+df = read_csv("../../data/df_accuracy_permutations.csv",
+                       col_types = cols())
+
+```
+
+```{r}
+row_names = c("FG2","FG3","FG4")
+col_names = rev(row_names)
+
+mat_holder = matrix(, nrow = 3, ncol = 3)
+
+df_filtered <-
+  df %>% 
+  filter(classifcation == "cyto")
+
+for (i in 1:length(row_names)){
+  for (j in 1:length(col_names)){
+    n = sum((df_filtered$true_label == col_names[j]) & (df_filtered$predicted_label == row_names[i]))
+    mat_holder[i,j] = n/sum(df$true_label == col_names[j])*100
+  }
+}
+
+rownames(mat_holder) <- row_names
+colnames(mat_holder) <- col_names
+
+ mat_holder %>%
+    ggcorrplot(lab = TRUE,
+           lab_size = 2,
+      tl.cex = 12) +
+  scale_fill_viridis(limits = c(0, 100),
+                     name = "Percentage") +
+  ggtitle("Cyto")
+ 
+  ggsave(
+      filename = '../figures/4_confusion_matrices_permutations/cyto_confusion.pdf',
+      width = 3,
+      height = 3
+    )
+ 
+
+```
+
+
+
+```{r}
+row_names = c("word","face","body","place")
+col_names = rev(row_names)
+
+matrix_holder = matrix(, nrow = 4, ncol = 4)
+
+df_filtered <-
+  df %>% 
+  filter(classifcation == "category")
+
+for (i in 1:length(row_names)){
+  for (j in 1:length(col_names)){
+    n = sum((df_filtered$true_label == col_names[j]) & (df_filtered$predicted_label == row_names[i]))
+    matrix_holder[i,j] = n/sum(df_filtered$true_label == col_names[j])*100
+  }
+}
+
+rownames(matrix_holder) <- row_names
+colnames(matrix_holder) <- col_names
+
+ matrix_holder %>%
+    ggcorrplot(lab = TRUE,
+           lab_size = 2,
+      tl.cex = 12) +
+  scale_fill_viridis(limits = c(0, 100),
+                     name = "Percentage") +
+  ggtitle("Category") 
+ 
+  ggsave(
+      filename = '../figures/4_confusion_matrices_permutations/category_confusion.pdf',
+      width = 3,
+      height = 3
+    )
+ 
+
+```
+
+```{r}
+row_names = c("0 months","3 months","6 months","Adults")
+col_names = rev(row_names)
+
+df_filtered <-
+  df %>% 
+  filter(classifcation == "age")
+
+matrix_holder = matrix(, nrow = 4, ncol = 4)
+
+for (i in 1:length(row_names)){
+  for (j in 1:length(col_names)){
+    n = sum((df_filtered$true_label == col_names[j]) & (df_filtered$predicted_label == row_names[i]))
+    matrix_holder[i,j] = n/sum(df_filtered$true_label == col_names[j])*100
+  }
+}
+
+rownames(matrix_holder) <- c("OM","3M","6M","A")
+colnames(matrix_holder) <- rev(c("OM","3M","6M","A"))
+matrix_holder %>%
+    ggcorrplot(lab = TRUE,
+           lab_size = 2,
+      tl.cex = 12) +
+  scale_fill_viridis(limits = c(0, 100),
+                     name = "Percentage") +
+  ggtitle("Age") 
+
+ggsave(
+      filename = '../figures/4_confusion_matrices_permutations/age_confusion.pdf',
+      width = 3,
+      height = 3
+    )
+
+```
