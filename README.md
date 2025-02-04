@@ -19,7 +19,7 @@ The `analyses/` subdirectory contains code used to preprocess diffusion data, in
 
 `supplement` includes code to generate Supplementary Figures. 
 
-`labels` contains the ROIs used for the analyses in fsaverage space within the `evc\` and `frois`\ subdirectories.
+`labels` contains the ROIs used for the analyses in fsaverage space within the `evc\` and `frois\` subdirectories.
 
 #### Dependencies
 The code should be runnable on your local machine assuming the following dependencies:
